@@ -22,6 +22,6 @@
 		"composer/installers": "*"
 	},
 	"extra": {
-		"installer-name": "CakeCron"
+		"installer-name": "CakeCsv"
 	}
 }
