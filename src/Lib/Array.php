@@ -1,5 +1,10 @@
 <?php
-class CsvFromArray {
+namespace CakeCsv\Lib;
+
+use Cake\Filesystem\File;
+use Cake\Utility\Hash;
+
+class Array {
 
 /**
  * The csv files headings
@@ -90,7 +95,7 @@ class CsvFromArray {
  */
 	public function headings(array $fields) {
 		if (!empty($this->_headings) && !empty($this->_rows) && count($this->_headings) !== count($fields)) {
-			throw new InvalidArgumentException(__d('cake_csv', 'Invalid number of columns, expected %d got %d', count($this->_headings), count($fields)));
+			throw new Exception(__d('cake_csv', 'Invalid number of columns, expected %d got %d', count($this->_headings), count($fields)));
 		}
 		if ($this->_columnCount === null) {
 			$this->_columnCount = count($fields);
@@ -141,7 +146,7 @@ class CsvFromArray {
 		}
 
 		if ($this->_columnCount != count($fields)) {
-			throw new InvalidArgumentException(__d('cake_csv', 'Invalid number of columns, expected %d got %d', $this->_columnCount, count($row)));
+			throw new Exception(__d('cake_csv', 'Invalid number of columns, expected %d got %d', $this->_columnCount, count($row)));
 		}
 
 		$this->_rows[] = $fields;
@@ -227,7 +232,7 @@ class CsvFromArray {
 		}
 
 		if (!($this->_File instanceof File)) {
-			throw new InvalidArgumentException(__d('cake_csv', 'No file specified for saving'));
+			throw new Exception(__d('cake_csv', 'No file specified for saving'));
 		}
 
 		return $this->_File;

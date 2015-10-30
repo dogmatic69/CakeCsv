@@ -1,4 +1,10 @@
 <?php
+namespace CakeCsv\Lib;
+
+use Cake\Core\Exception\Exception;
+use Cake\Utility\Hash;
+use Cake\Utility\Inflector;
+
 /**
  * CsvFileObject for reading csv data from files
  *
@@ -12,7 +18,7 @@
  * @see http://www.php.net/manual/en/splfileobject.setcsvcontrol.php
  */
 
-class CsvFileObject extends SplFileObject {
+class File extends \SplFileObject {
 /**
  * does the csv file contain a heading as the first row
  *
@@ -112,11 +118,31 @@ class CsvFileObject extends SplFileObject {
 			}
 
 			if (count($this->_headings) != count(array_unique($this->_headings))) {
-				throw new CakeException('Some headings are not unique (Case insensitive)');
+				throw new Exception('Some headings are not unique (Case insensitive)');
 			}
 		}
 
 		return $this->_headings;
+	}
+
+/**
+ * Get the raw headings for a csv data set
+ *
+ * @return array
+ */
+	public function rawHeadings() {
+		if (!$this->hasHeadings()) {
+			return array();
+		}
+
+		$this->rewind();
+		$raw = $this->fgetcsv();
+
+		if (count($raw) != count(array_unique($raw))) {
+			throw new Exception('Some headings are not unique (Case insensitive)');
+		}
+
+		return $raw;
 	}
 
 /**

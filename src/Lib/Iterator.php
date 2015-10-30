@@ -1,13 +1,16 @@
 <?php
-App::uses('CsvFileObject', 'CakeCsv.Lib');
+namespace CakeCsv\Lib;
+
+use CakeCsv\Lib\File;
 
 /**
  * CsvIterator
  *
- * @param CsvFileObject $_CsvFileObject
+ * @param CakeCsv\Lib\File $_CsvFileObject
  */
 
-class CsvIterator implements Iterator {
+class Iterator implements \Iterator {
+
 /**
  * the current row from the csv file
  *
@@ -36,8 +39,8 @@ class CsvIterator implements Iterator {
  * @param integer $rowSize the max size of a single row (0 for unlimited)
  */
 
-	public function __construct(CsvFileObject $CsvFileObject) {
-		$this->_CsvFileObject = $CsvFileObject;
+	public function __construct(File $File) {
+		$this->_CsvFileObject = $File;
 	}
 
 /**
