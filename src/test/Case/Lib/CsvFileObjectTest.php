@@ -1,363 +1,391 @@
 <?php
-App::uses('CsvFileObject', 'CakeCsv.Lib');
-
-class CsvFileObjectTest extends CakeTestCase {
-/**
- * start up method
- */
-	public function setUp() {
-		$this->path = CakePlugin::path('CakeCsv') . 'Test' . DS . 'Fixture' . DS;
-		parent::setUp();
-	}
+namespace CakeCsv\Test\TestCase\Lib;
 
 /**
- * tear down method
+ * CsvFileObjectTest
  */
-	public function tearDown() {
-		parent::tearDown();
-	}
+class CsvFileObjectTest extends CakeTestCase
+{
 
-/**
- * test headings
- */
-	public function testHeading() {
-		$Csv = new CsvFileObject($this->path . 'file1.csv');
+    /**
+     * start up method
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        $this->path = CakePlugin::path('CakeCsv') . 'Test' . DS . 'Fixture' . DS;
+        parent::setUp();
+    }
 
-		$this->assertTrue($Csv->hasHeadings());
-		$expected = array(
-			array(
-				'field_1' => '1a',
-				'field_2' => '2a///\\\\\\',
-				'field_3' => '3a'
-			),
-			array(
-				'field_1' => '1b\'\'\'',
-				'field_2' => '2b”””',
-				'field_3' => '3b'
-			),
-			array(
-				'field_1' => '1c',
-				'field_2' => '2c,,,',
-				'field_3' => '3c'
-			)
-		);
-		$headings = array(
-			'field_1',
-			'field_2',
-			'field_3'
-		);
+    /**
+     * tear down method
+     *
+     * @return void
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
+    }
 
-		for($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
+    /**
+     * test headings
+     *
+     * @return void
+     */
+    public function testHeading()
+    {
+        $Csv = new CsvFileObject($this->path . 'file1.csv');
 
-			$result = $Csv->headings();
-			$this->assertEquals($headings, $result);
-		}
+        $this->assertTrue($Csv->hasHeadings());
+        $expected = [
+            [
+                'field_1' => '1a',
+                'field_2' => '2a///\\\\\\',
+                'field_3' => '3a'
+            ],
+            [
+                'field_1' => '1b\'\'\'',
+                'field_2' => '2b”””',
+                'field_3' => '3b'
+            ],
+            [
+                'field_1' => '1c',
+                'field_2' => '2c,,,',
+                'field_3' => '3c'
+            ],
+        ];
+        $headings = [
+            'field_1',
+            'field_2',
+            'field_3'
+        ];
 
-		foreach ($expected as &$v) {
-			$v = array_values($v);
-		}
-		array_unshift($expected, array(
-			'Field_1',
-			'Field 2',
-			'FIELD-3'
-		));
-		$headings = array();
-		$Csv = new CsvFileObject($this->path . 'file1.csv', array(
-			'heading' => false
-		));
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
 
-		$this->assertFalse($Csv->hasHeadings());
+            $result = $Csv->headings();
+            $this->assertEquals($headings, $result);
+        }
 
-		for($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
+        foreach ($expected as &$v) {
+            $v = array_values($v);
+        }
+        array_unshift($expected, [
+            'Field_1',
+            'Field 2',
+            'FIELD-3'
+        ]);
+        $headings = [];
+        $Csv = new CsvFileObject($this->path . 'file1.csv', [
+            'heading' => false
+        ]);
 
-			$result = $Csv->headings();
-			$this->assertEquals($headings, $result);
-		}
-	}
+        $this->assertFalse($Csv->hasHeadings());
 
-/**
- * test rewind
- */
-	public function testRewind() {
-		$Csv = new CsvFileObject($this->path . 'file1.csv');
-		$expected = array(
-			array(
-				'field_1' => 'Field_1',
-				'field_2' => 'Field 2',
-				'field_3' => 'FIELD-3'
-			),
-			array(
-				'field_1' => '1a',
-				'field_2' => '2a///\\\\\\',
-				'field_3' => '3a'
-			),
-			array(
-				'field_1' => '1b\'\'\'',
-				'field_2' => '2b”””',
-				'field_3' => '3b'
-			),
-			array(
-				'field_1' => '1c',
-				'field_2' => '2c,,,',
-				'field_3' => '3c'
-			)
-		);
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
 
-		$result = $Csv->read();
-		$this->assertEquals($expected[1], $result);
+            $result = $Csv->headings();
+            $this->assertEquals($headings, $result);
+        }
+    }
 
-		$result = $Csv->read();
-		$this->assertEquals($expected[2], $result);
+    /**
+     * test rewind
+     *
+     * @return void
+     */
+    public function testRewind()
+    {
+        $Csv = new CsvFileObject($this->path . 'file1.csv');
+        $expected = [
+            [
+                'field_1' => 'Field_1',
+                'field_2' => 'Field 2',
+                'field_3' => 'FIELD-3'
+            ],
+            [
+                'field_1' => '1a',
+                'field_2' => '2a///\\\\\\',
+                'field_3' => '3a'
+            ],
+            [
+                'field_1' => '1b\'\'\'',
+                'field_2' => '2b”””',
+                'field_3' => '3b'
+            ],
+            [
+                'field_1' => '1c',
+                'field_2' => '2c,,,',
+                'field_3' => '3c'
+            ],
+        ];
 
-		$Csv->rewind();
+        $result = $Csv->read();
+        $this->assertEquals($expected[1], $result);
 
-		$result = $Csv->read();
-		$this->assertEquals($expected[0], $result);
-	}
+        $result = $Csv->read();
+        $this->assertEquals($expected[2], $result);
 
-/**
- * test reading csv files
- */
-	public function testRead() {
-		$Csv = new CsvFileObject($this->path . 'file1.csv');
-		$expected = array(
-			array(
-				'field_1' => '1a',
-				'field_2' => '2a///\\\\\\',
-				'field_3' => '3a'
-			),
-			array(
-				'field_1' => '1b\'\'\'',
-				'field_2' => '2b”””',
-				'field_3' => '3b'
-			),
-			array(
-				'field_1' => '1c',
-				'field_2' => '2c,,,',
-				'field_3' => '3c'
-			)
-		);
+        $Csv->rewind();
 
-		for($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
-		}
+        $result = $Csv->read();
+        $this->assertEquals($expected[0], $result);
+    }
 
-		for($i = 0; $i < 3; $i++) {
-			$this->assertEquals(array(), $Csv->read());
-		}
-	}
+    /**
+     * test reading csv files
+     *
+     * @return void
+     */
+    public function testRead()
+    {
+        $Csv = new CsvFileObject($this->path . 'file1.csv');
+        $expected = [
+            [
+                'field_1' => '1a',
+                'field_2' => '2a///\\\\\\',
+                'field_3' => '3a'
+            ],
+            [
+                'field_1' => '1b\'\'\'',
+                'field_2' => '2b”””',
+                'field_3' => '3b'
+            ],
+            [
+                'field_1' => '1c',
+                'field_2' => '2c,,,',
+                'field_3' => '3c'
+            ],
+        ];
 
-/**
- * test reading with a default model defined
- */
-	public function testReadDefaultModel() {
-		$Csv = new CsvFileObject($this->path . 'file1.csv', array(
-			'model' => 'MyModel'
-		));
-		$expected = array(
-			array(
-				'MyModel' => array(
-					'field_1' => '1a',
-					'field_2' => '2a///\\\\\\',
-					'field_3' => '3a'
-				)
-			),
-			array(
-				'MyModel' => array(
-					'field_1' => '1b\'\'\'',
-					'field_2' => '2b”””',
-					'field_3' => '3b'
-				)
-			),
-			array(
-				'MyModel' => array(
-					'field_1' => '1c',
-					'field_2' => '2c,,,',
-					'field_3' => '3c'
-				)
-			)
-		);
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
+        }
 
-		for($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
-		}
+        for ($i = 0; $i < 3; $i++) {
+            $this->assertEquals([], $Csv->read());
+        }
+    }
 
-		for($i = 0; $i < 3; $i++) {
-			$this->assertEquals(array(), $Csv->read());
-		}
-	}
+    /**
+     * test reading with a default model defined
+     *
+     * @return void
+     */
+    public function testReadDefaultModel()
+    {
+        $Csv = new CsvFileObject($this->path . 'file1.csv', [
+            'model' => 'MyModel'
+        ]);
+        $expected = [
+            [
+                'MyModel' => [
+                    'field_1' => '1a',
+                    'field_2' => '2a///\\\\\\',
+                    'field_3' => '3a',
+                ],
+            ],
+            [
+                'MyModel' => [
+                    'field_1' => '1b\'\'\'',
+                    'field_2' => '2b”””',
+                    'field_3' => '3b',
+                ],
+            ],
+            [
+                'MyModel' => [
+                    'field_1' => '1c',
+                    'field_2' => '2c,,,',
+                    'field_3' => '3c',
+                ],
+            ],
+        ];
 
-/**
- * test read different models
- */
-	public function testReadDifferentModels() {
-		$Csv = new CsvFileObject($this->path . 'file2.csv');
-		$expected = array(
-			array(
-				'Model' => array(
-					'field' => '1a'
-				),
-				'OtherModel' => array(
-					'field' => '2a///\\\\\\'
-				),
-				'SomeModel' => array(
-					'field' => '3a'
-				),
-				'nomodel' => 1
-			),
-			array(
-				'Model' => array(
-					'field' => '1b\'\'\''
-				),
-				'OtherModel' => array(
-					'field' => '2b”””'
-				),
-				'SomeModel' => array(
-					'field' => '3b'
-				),
-				'nomodel' => 2
-			),
-			array(
-				'Model' => array(
-					'field' => '1c',
-				),
-				'OtherModel' => array(
-					'field' => '2c,,,',
-				),
-				'SomeModel' => array(
-					'field' => '3c'
-				),
-				'nomodel' => 3
-			)
-		);
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
+        }
 
-		for ($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
-		}
+        for ($i = 0; $i < 3; $i++) {
+            $this->assertEquals([], $Csv->read());
+        }
+    }
 
-		for ($i = 0; $i < 3; $i++) {
-			$this->assertEquals(array(), $Csv->read());
-		}
-	}
+    /**
+     * test read different models
+     *
+     * @return void
+     */
+    public function testReadDifferentModels()
+    {
+        $Csv = new CsvFileObject($this->path . 'file2.csv');
+        $expected = [
+            [
+                'Model' => [
+                    'field' => '1a',
+                ],
+                'OtherModel' => [
+                    'field' => '2a///\\\\\\',
+                ],
+                'SomeModel' => [
+                    'field' => '3a',
+                ],
+                'nomodel' => 1,
+            ],
+            [
+                'Model' => [
+                    'field' => '1b\'\'\'',
+                ],
+                'OtherModel' => [
+                    'field' => '2b”””',
+                ],
+                'SomeModel' => [
+                    'field' => '3b',
+                ],
+                'nomodel' => 2,
+            ],
+            [
+                'Model' => [
+                    'field' => '1c',
+                ],
+                'OtherModel' => [
+                    'field' => '2c,,,',
+                ],
+                'SomeModel' => [
+                    'field' => '3c',
+                ],
+                'nomodel' => 3,
+            ],
+        ];
 
-/**
- * test read different models custom
- */
-	public function testReadDifferentModelsCustom() {
-		$Csv = new CsvFileObject($this->path . 'file2.csv', array(
-			'model' => 'MyModel'
-		));
-		$expected = array(
-			array(
-				'Model' => array(
-					'field' => '1a'
-				),
-				'OtherModel' => array(
-					'field' => '2a///\\\\\\'
-				),
-				'SomeModel' => array(
-					'field' => '3a'
-				),
-				'MyModel' => array(
-					'nomodel' => 1
-				)
-			),
-			array(
-				'Model' => array(
-					'field' => '1b\'\'\''
-				),
-				'OtherModel' => array(
-					'field' => '2b”””'
-				),
-				'SomeModel' => array(
-					'field' => '3b'
-				),
-				'MyModel' => array(
-					'nomodel' => 2
-				)
-			),
-			array(
-				'Model' => array(
-					'field' => '1c',
-				),
-				'OtherModel' => array(
-					'field' => '2c,,,',
-				),
-				'SomeModel' => array(
-					'field' => '3c'
-				),
-				'MyModel' => array(
-					'nomodel' => 3
-				)
-			)
-		);
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
+        }
 
-		for($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
-		}
+        for ($i = 0; $i < 3; $i++) {
+            $this->assertEquals([], $Csv->read());
+        }
+    }
 
-		for($i = 0; $i < 3; $i++) {
-			$this->assertEquals(array(), $Csv->read());
-		}
+    /**
+     * test read different models custom
+     *
+     * @return void
+     */
+    public function testReadDifferentModelsCustom()
+    {
+        $Csv = new CsvFileObject($this->path . 'file2.csv', [
+            'model' => 'MyModel'
+        ]);
+        $expected = [
+            [
+                'Model' => [
+                    'field' => '1a',
+                ],
+                'OtherModel' => [
+                    'field' => '2a///\\\\\\',
+                ],
+                'SomeModel' => [
+                    'field' => '3a',
+                ],
+                'MyModel' => [
+                    'nomodel' => 1,
+                ],
+            ],
+            [
+                'Model' => [
+                    'field' => '1b\'\'\'',
+                ],
+                'OtherModel' => [
+                    'field' => '2b”””',
+                ],
+                'SomeModel' => [
+                    'field' => '3b',
+                ],
+                'MyModel' => [
+                    'nomodel' => 2,
+                ],
+            ],
+            [
+                'Model' => [
+                    'field' => '1c',
+                ],
+                'OtherModel' => [
+                    'field' => '2c,,,',
+                ],
+                'SomeModel' => [
+                    'field' => '3c',
+                ],
+                'MyModel' => [
+                    'nomodel' => 3,
+                ],
+            ],
+        ];
 
-		$Csv = new CsvFileObject($this->path . 'file2.csv', array(
-			'model' => 'OtherModel'
-		));
-		$expected = array(
-			array(
-				'Model' => array(
-					'field' => '1a'
-				),
-				'OtherModel' => array(
-					'field' => '2a///\\\\\\',
-					'nomodel' => 1
-				),
-				'SomeModel' => array(
-					'field' => '3a'
-				)
-			),
-			array(
-				'Model' => array(
-					'field' => '1b\'\'\''
-				),
-				'OtherModel' => array(
-					'field' => '2b”””',
-					'nomodel' => 2
-				),
-				'SomeModel' => array(
-					'field' => '3b'
-				)
-			),
-			array(
-				'Model' => array(
-					'field' => '1c',
-				),
-				'OtherModel' => array(
-					'field' => '2c,,,',
-					'nomodel' => 3
-				),
-				'SomeModel' => array(
-					'field' => '3c'
-				)
-			)
-		);
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
+        }
 
-		for($i = 0; $i < 3; $i++) {
-			$result = $Csv->read();
-			$this->assertEquals($expected[$i], $result);
-		}
+        for ($i = 0; $i < 3; $i++) {
+            $this->assertEquals([], $Csv->read());
+        }
 
-		for($i = 0; $i < 3; $i++) {
-			$this->assertEquals(array(), $Csv->read());
-		}
-	}
+        $Csv = new CsvFileObject($this->path . 'file2.csv', [
+            'model' => 'OtherModel',
+        ]);
+        $expected = [
+            [
+                'Model' => [
+                    'field' => '1a',
+                ],
+                'OtherModel' => [
+                    'field' => '2a///\\\\\\',
+                    'nomodel' => 1,
+                ],
+                'SomeModel' => [
+                    'field' => '3a',
+                ],
+            ],
+            [
+                'Model' => [
+                    'field' => '1b\'\'\'',
+                ],
+                'OtherModel' => [
+                    'field' => '2b”””',
+                    'nomodel' => 2,
+                ],
+                'SomeModel' => [
+                    'field' => '3b',
+                ],
+            ],
+            [
+                'Model' => [
+                    'field' => '1c',
+                ],
+                'OtherModel' => [
+                    'field' => '2c,,,',
+                    'nomodel' => 3,
+                ],
+                'SomeModel' => [
+                    'field' => '3c',
+                ],
+            ],
+        ];
 
+        for ($i = 0; $i < 3; $i++) {
+            $result = $Csv->read();
+            $this->assertEquals($expected[$i], $result);
+        }
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->assertEquals([], $Csv->read());
+        }
+    }
 }

@@ -4,278 +4,310 @@ namespace CakeCsv\Lib;
 use Cake\Filesystem\File;
 use Cake\Utility\Hash;
 
-class Array {
-
 /**
- * The csv files headings
+ * Array
  *
- * @var array
+ * @package dogmatic69.CakeCsv.Lib
  */
-	protected $_headings = array();
+class Array
+{
 
-/**
- * The csv files rows
- *
- * @var array
- */
-	protected $_rows = array();
+    /**
+     * The csv files headings
+     *
+     * @var array
+     */
+    protected $_headings = [];
 
-/**
- * The configuration in use by the instance
- *
- * @var array
- */
-	protected $_config = array();
+    /**
+     * The csv files rows
+     *
+     * @var array
+     */
+    protected $_rows = [];
 
-/**
- * The default configuration options
- *
- * @var array
- */
-	protected $_default = array(
-		'delimiter' => ';',
-		'enclosure' => '"',
-		'encloseAll' => false,
-		'mysqlNull' => false,
-		'headings' => true
-	);
+    /**
+     * The configuration in use by the instance
+     *
+     * @var array
+     */
+    protected $_config = [];
 
-/**
- * The count of coloumns
- *
- * This is used to check that a valid number of columns are added as the file is being
- * added too. It is calculated by the first row or heading added to the file.
- *
- * @var integer|null
- */
-	protected $_columnCount = null;
+    /**
+     * The default configuration options
+     *
+     * @var array
+     */
+    protected $_default = [
+        'delimiter' => ';',
+        'enclosure' => '"',
+        'encloseAll' => false,
+        'mysqlNull' => false,
+        'headings' => true
+    ];
 
-/**
- * Instance of the File class
- *
- * @var File
- */
-	protected $_File;
+    /**
+     * The count of coloumns
+     *
+     * This is used to check that a valid number of columns are added as the file is being
+     * added too. It is calculated by the first row or heading added to the file.
+     *
+     * @var integer|null
+     */
+    protected $_columnCount = null;
 
-/**
- * Initialise the file and configs
- *
- * @param string $path the path to save the csv file to
- * @param array $config the configuration options
- *
- * @return void
- */
-	public function __construct($path, array $config = array()) {
-		$this->_file($path);
-		$this->config($config);
-	}
+    /**
+     * Instance of the File class
+     *
+     * @var File
+     */
+    protected $_File;
 
-/**
- * Change the csv configuration
- *
- * @param array $config the config options to use
- *
- * @return void
- */
-	public function config(array $config) {
-		$this->_config = array_merge($this->_default, $config);
-	}
+    /**
+     * Initialise the file and configs
+     *
+     * @param string $path the path to save the csv file to
+     * @param array $config the configuration options
+     *
+     * @return void
+     */
+    public function __construct($path, array $config = [])
+    {
+        $this->_file($path);
+        $this->config($config);
+    }
 
-/**
- * Set the headings for the csv file
- *
- * Headings can be set at any point so long as once rows have been added the headings match
- * the number of columns.
- *
- * @param  array $fields the values for the csv files headings
- *
- * @return void
- *
- * @throws InvalidArgumentException
- */
-	public function headings(array $fields) {
-		if (!empty($this->_headings) && !empty($this->_rows) && count($this->_headings) !== count($fields)) {
-			throw new Exception(__d('cake_csv', 'Invalid number of columns, expected %d got %d', count($this->_headings), count($fields)));
-		}
-		if ($this->_columnCount === null) {
-			$this->_columnCount = count($fields);
-		}
+    /**
+     * Change the csv configuration
+     *
+     * @param array $config the config options to use
+     *
+     * @return void
+     */
+    public function config(array $config)
+    {
+        $this->_config = array_merge($this->_default, $config);
+    }
 
-		$this->_headings = $fields;
-	}
+    /**
+     * Set the headings for the csv file
+     *
+     * Headings can be set at any point so long as once rows have been added the headings match
+     * the number of columns.
+     *
+     * @param  array $fields the values for the csv files headings
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException
+     */
+    public function headings(array $fields)
+    {
+        if (!empty($this->_headings) && !empty($this->_rows) && count($this->_headings) !== count($fields)) {
+            throw new InvalidArgumentException(__d('cake_csv', 'Invalid number of columns, expected %d got %d', count($this->_headings), count($fields)));
+        }
+        if ($this->_columnCount === null) {
+            $this->_columnCount = count($fields);
+        }
 
-/**
- * Wrapper to add multiple rows at once
- *
- * $rows should contain a numerical indexed array. If a string keyed array is
- * passed it is assumed to be a single row and will be wrapped in an array to
- * create the expected numerical array
- *
- * @param array $rows the rows of data to add to the file
- *
- * @return void
- */
-	public function rows(array &$rows) {
-		if (!Hash::numeric(array_keys($rows))) {
-			$rows = array($rows);
-		}
+        $this->_headings = $fields;
+    }
 
-		foreach ($rows as $row) {
-			$this->row($row);
-		}
-	}
+    /**
+     * Wrapper to add multiple rows at once
+     *
+     * $rows should contain a numerical indexed array. If a string keyed array is
+     * passed it is assumed to be a single row and will be wrapped in an array to
+     * create the expected numerical array
+     *
+     * @param array $rows the rows of data to add to the file
+     *
+     * @return void
+     */
+    public function rows(array &$rows)
+    {
+        if (!Hash::numeric(array_keys($rows))) {
+            $rows = [$rows];
+        }
 
-/**
- * Add a row to the csv file
- *
- * All rows should have the same number of columns, if not an exception will be thrown.
- *
- * @param array $fields the fields for the row being added
- *
- * @return void
- */
-	public function row(array $fields) {
-		$fields = Hash::flatten($fields);
-		if ($this->_config('headings') && empty($this->_headings)) {
-			$this->headings(array_keys($fields));
-		}
+        foreach ($rows as $row) {
+            $this->row($row);
+        }
+    }
 
-		$fields = array_values($fields);
-		if ($this->_columnCount === null) {
-			$this->_columnCount = count($fields);
-		}
+    /**
+     * Add a row to the csv file
+     *
+     * All rows should have the same number of columns, if not an exception will be thrown.
+     *
+     * @param array $fields the fields for the row being added
+     *
+     * @return void
+     *
+     * @throws Exception if there is the wrong number of columbs
+     */
+    public function row(array $fields)
+    {
+        $fields = Hash::flatten($fields);
+        if ($this->_config('headings') && empty($this->_headings)) {
+            $this->headings(array_keys($fields));
+        }
 
-		if ($this->_columnCount != count($fields)) {
-			throw new Exception(__d('cake_csv', 'Invalid number of columns, expected %d got %d', $this->_columnCount, count($row)));
-		}
+        $fields = array_values($fields);
+        if ($this->_columnCount === null) {
+            $this->_columnCount = count($fields);
+        }
 
-		$this->_rows[] = $fields;
-	}
+        if ($this->_columnCount != count($fields)) {
+            throw new Exception(__d('cake_csv', 'Invalid number of columns, expected %d got %d', $this->_columnCount, count($row)));
+        }
 
-/**
- * Resets the rows and headings
- *
- * Headings is optional, defaults to false. This is used for the append so
- * that data can be cleared after each write and not duplicated in the file.
- *
- * @param boolean $headings pass true to clear headings also.
- *
- * @return array
- */
-	public function reset($headings = false) {
-		$this->_rows = array();
-		if ($headings) {
-			$this->_headings = array();
-		}
+        $this->_rows[] = $fields;
+    }
 
-		return true;
-	}
+    /**
+     * Resets the rows and headings
+     *
+     * Headings is optional, defaults to false. This is used for the append so
+     * that data can be cleared after each write and not duplicated in the file.
+     *
+     * @param bool $headings pass true to clear headings also.
+     *
+     * @return array
+     */
+    public function reset($headings = false)
+    {
+        $this->_rows = [];
+        if ($headings) {
+            $this->_headings = [];
+        }
 
-	public function write(array $rows = array()) {
-		if ($rows) {
-			$this->rows($rows);
-		}
-		if ($this->_file()->write($this->_escaped())) {
-			return $this->reset();
-		}
+        return true;
+    }
 
-		return false;
-	}
+    /**
+     * Write a row to the csv file
+     *
+     * @param array $rows set of data to write (one row, multiple columns)
+     *
+     * @return bool
+     */
+    public function write(array $rows = [])
+    {
+        if ($rows) {
+            $this->rows($rows);
+        }
+        if ($this->_file()->write($this->_escaped())) {
+            return $this->reset();
+        }
 
-	public function append(array $rows = array()) {
-		if ($rows) {
-			$this->rows($rows);
-		}
+        return false;
+    }
 
-		clearstatcache();
-		if (!$this->_file()->size()) {
-			return $this->write();
-		}
+    /**
+     * @param array $rows append data to the file
+     *
+     * @return bool
+     */
+    public function append(array $rows = [])
+    {
+        if ($rows) {
+            $this->rows($rows);
+        }
 
-		if ($this->_file()->append($this->_escaped(true))) {
-			return $this->reset();
-		}
+        clearstatcache();
+        if (!$this->_file()->size()) {
+            return $this->write();
+        }
 
-		return false;
-	}
+        if ($this->_file()->append($this->_escaped(true))) {
+            return $this->reset();
+        }
 
-/**
- * Fetch a config value
- *
- * @param  [type] $field [description]
- * @return array
- */
-	protected function _config($field) {
-		if (empty($this->_config)) {
-			$this->config(array());
-		}
+        return false;
+    }
 
-		if (array_key_exists($field, $this->_config)) {
-			return $this->_config[$field];
-		}
+    /**
+     * Fetch a config value
+     *
+     * @param string $field the field to read from the config
+     *
+     * @return array|string|int|null
+     */
+    protected function _config($field)
+    {
+        if (empty($this->_config)) {
+            $this->config([]);
+        }
 
-		return null;
-	}
+        if (array_key_exists($field, $this->_config)) {
+            return $this->_config[$field];
+        }
 
-/**
- * Get an instace of the File
- *
- * If path is specified a new File class object is created
- *
- * @param string $path the path of the file to be saved
- *
- * @return File
- */
-	protected function _file($path = null) {
-		if ($path !== null) {
-			$this->_File = new File($path, true);
-		}
+        return null;
+    }
 
-		if (!($this->_File instanceof File)) {
-			throw new Exception(__d('cake_csv', 'No file specified for saving'));
-		}
+    /**
+     * Get an instace of the File
+     *
+     * If path is specified a new File class object is created
+     *
+     * @param string $path the path of the file to be saved
+     *
+     * @return File
+     */
+    protected function _file($path = null)
+    {
+        if ($path !== null) {
+            $this->_File = new File($path, true);
+        }
 
-		return $this->_File;
-	}
+        if (!($this->_File instanceof File)) {
+            throw new Exception(__d('cake_csv', 'No file specified for saving'));
+        }
 
-/**
- * Escape all the data in the array and build the csv data
- *
- * If the $append param is true headings will no be added to the file. This is so that the file
- * can be incrementally updated without adding the headings again.
- *
- * @param boolean $append appending to an existing file
- *
- * @return string
- */
-	protected function _escaped($append = false) {
-		$delimiter = $this->_config('delimiter');
-		$enclosure = $this->_config('enclosure');
-		$delimiter_esc = preg_quote($delimiter, '/');
-		$enclosure_esc = preg_quote($enclosure, '/');
-		$mysqlNull = $this->_config('mysqlNull');
-		$encloseAll = $this->_config('encloseAll');
+        return $this->_File;
+    }
 
-		$rows = $this->_rows;
-		if ($append === false && $this->_headings) {
-			array_unshift($rows, $this->_headings);
-		}
+    /**
+     * Escape all the data in the array and build the csv data
+     *
+     * If the $append param is true headings will no be added to the file. This is so that the file
+     * can be incrementally updated without adding the headings again.
+     *
+     * @param bool $append appending to an existing file
+     *
+     * @return string
+     */
+    protected function _escaped($append = false)
+    {
+        $delimiter = $this->_config('delimiter');
+        $enclosure = $this->_config('enclosure');
+        $delimiterEsc = preg_quote($delimiter, '/');
+        $enclosureEsc = preg_quote($enclosure, '/');
+        $mysqlNull = $this->_config('mysqlNull');
+        $encloseAll = $this->_config('encloseAll');
 
-		$output = array();
-		foreach ($rows as $fields) {
-			foreach ($fields as &$field) {
-				if ($field === null && $mysqlNull) {
-					$field = 'NULL';
-					continue;
-				}
+        $rows = $this->_rows;
+        if ($append === false && $this->_headings) {
+            array_unshift($rows, $this->_headings);
+        }
 
-				if ($encloseAll || preg_match("/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field)) {
-					$field = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
-				}
-			}
-			$output[] = implode($delimiter, $fields);
-		}
+        $output = [];
+        foreach ($rows as $fields) {
+            foreach ($fields as &$field) {
+                if ($field === null && $mysqlNull) {
+                    $field = 'NULL';
+                    continue;
+                }
 
-		return trim(implode("\n", $output), "\n") . "\n";
-	}
+                if ($encloseAll || preg_match("/(?:${delimiterEsc}|${enclosureEsc}|\s)/", $field)) {
+                    $field = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
+                }
+            }
+            $output[] = implode($delimiter, $fields);
+        }
+
+        return trim(implode("\n", $output), "\n") . "\n";
+    }
 }

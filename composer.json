@@ -18,9 +18,13 @@
 		"source": "https://github.com/dogmatic69/CakeCsv"
 	},
 	"require": {
-		"php": ">=5.3.0",
+		"php": ">=5.4.16",
 		"composer/installers": "*"
 	},
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "cakephp/cakephp-codesniffer": "dev-master"
+    },
 	"extra": {
 		"installer-name": "CakeCsv"
 	}

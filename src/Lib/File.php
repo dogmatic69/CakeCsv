@@ -16,151 +16,160 @@ use Cake\Utility\Inflector;
  *
  * @see http://php.net/manual/en/class.splfileobject.php
  * @see http://www.php.net/manual/en/splfileobject.setcsvcontrol.php
+ *
+ * @package dogmatic69.CakeCsv.Lib
  */
 
-class File extends \SplFileObject {
-/**
- * does the csv file contain a heading as the first row
- *
- * @var boolean
- */
-	protected $_hasHeading;
+class File extends \SplFileObject
+{
 
-/**
- * internal cache of the headings
- *
- * @var array
- */
-	protected $_headings = array();
+    /**
+     * does the csv file contain a heading as the first row
+     *
+     * @var bool
+     */
+    protected $_hasHeading;
 
-/**
- * the default model this data belongs to
- *
- * @var string
- */
-	protected $_model = null;
+    /**
+     * internal cache of the headings
+     *
+     * @var array
+     */
+    protected $_headings = [];
 
-/**
- * set up the csv iterator object
- *
- * $settings can contain the following:
- *	- mode: @see http://www.php.net/manual/en/function.fopen.php
- *	- include_path: boolean Whether to search in the include_path for filename.
- *  - delimiter: the csv field delimiter (default ,)
- *  - enclosure: the csv field enclosure (default ")
- *	- escape: the csv data escape char (default \)
- *	- heading: boolean, true if first row is headings, false if not (default true)
- *
- * To take advantage of this classes functionality, even though it extends SplFileObject
- * for reading csv files, that method should not be used direcly but instead only use
- * CsvFileObject::read()
- *
- * @param string $file the file to be loaded
- * @param array $settings
- *
- * @return void
- */
-	public function __construct($file, $settings = array()) {
-		$settings = array_merge(array(
-			'mode' => 'r',
-			'include_path' => false,
-			'resource' => null,
-			'delimiter' => ',',
-			'enclosure' => '"',
-			'escape' => '\\',
-			'heading' => true,
-			'model' => null
-		), $settings);
+    /**
+     * the default model this data belongs to
+     *
+     * @var string
+     */
+    protected $_model = null;
 
-		$this->_hasHeading = $settings['heading'];
+    /**
+     * set up the csv iterator object
+     *
+     * $settings can contain the following:
+     *  - mode: @see http://www.php.net/manual/en/function.fopen.php
+     *  - include_path: boolean Whether to search in the include_path for filename.
+     *  - delimiter: the csv field delimiter (default ,)
+     *  - enclosure: the csv field enclosure (default ")
+     *  - escape: the csv data escape char (default \)
+     *  - heading: boolean, true if first row is headings, false if not (default true)
+     *
+     * To take advantage of this classes functionality, even though it extends SplFileObject
+     * for reading csv files, that method should not be used direcly but instead only use
+     * CsvFileObject::read()
+     *
+     * @param string $file the file to be loaded
+     * @param array $settings the config for the csv file
+     *
+     * @return void
+     */
+    public function __construct($file, $settings = [])
+    {
+        $settings = array_merge([
+            'mode' => 'r',
+            'include_path' => false,
+            'resource' => null,
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape' => '\\',
+            'heading' => true,
+            'model' => null
+        ], $settings);
 
-		parent::__construct($file, $settings['mode'], $settings['include_path']);
+        $this->_hasHeading = $settings['heading'];
 
-		$this->setCsvControl($settings['delimiter'], $settings['enclosure'], $settings['escape']);
+        parent::__construct($file, $settings['mode'], $settings['include_path']);
 
-		$this->_model = $settings['model'];
-		$this->headings();
-	}
+        $this->setCsvControl($settings['delimiter'], $settings['enclosure'], $settings['escape']);
 
-/**
- * check if the file has headings
- *
- * @return boolean
- */
-	public function hasHeadings() {
-		return $this->_hasHeading;
-	}
+        $this->_model = $settings['model'];
+        $this->headings();
+    }
 
-/**
- * get headings from the csv file
- *
- * If there are headings available (see the settings) this will get them and return
- * an array that has been fomatted to suite easy importing.
- *
- * @return array
- */
-	public function headings() {
-		if ($this->hasHeadings() && empty($this->_headings)) {
-			$this->rewind();
-			$this->_headings = $this->fgetcsv();
+    /**
+     * check if the file has headings
+     *
+     * @return bool
+     */
+    public function hasHeadings()
+    {
+        return $this->_hasHeading;
+    }
 
-			foreach ($this->_headings as &$heading) {
-				if (strstr($heading, '.') === false) {
-					$heading = array($this->_model, $heading);
-				} else {
-					$heading = pluginSplit($heading);
-				}
+    /**
+     * get headings from the csv file
+     *
+     * If there are headings available (see the settings) this will get them and return
+     * an array that has been fomatted to suite easy importing.
+     *
+     * @return array
+     */
+    public function headings()
+    {
+        if ($this->hasHeadings() && empty($this->_headings)) {
+            $this->rewind();
+            $this->_headings = $this->fgetcsv();
 
-				$heading[0] = Inflector::classify($heading[0]);
-				$heading[1] = Inflector::slug(strtolower($heading[1]));
+            foreach ($this->_headings as &$heading) {
+                if (strstr($heading, '.') === false) {
+                    $heading = [$this->_model, $heading];
+                } else {
+                    $heading = pluginSplit($heading);
+                }
 
-				$heading = implode('.', array_filter($heading));
-			}
+                $heading[0] = Inflector::classify($heading[0]);
+                $heading[1] = Inflector::slug(strtolower($heading[1]));
 
-			if (count($this->_headings) != count(array_unique($this->_headings))) {
-				throw new Exception('Some headings are not unique (Case insensitive)');
-			}
-		}
+                $heading = implode('.', array_filter($heading));
+            }
 
-		return $this->_headings;
-	}
+            if (count($this->_headings) != count(array_unique($this->_headings))) {
+                throw new Exception('Some headings are not unique (Case insensitive)');
+            }
+        }
 
-/**
- * Get the raw headings for a csv data set
- *
- * @return array
- */
-	public function rawHeadings() {
-		if (!$this->hasHeadings()) {
-			return array();
-		}
+        return $this->_headings;
+    }
 
-		$this->rewind();
-		$raw = $this->fgetcsv();
+    /**
+     * Get the raw headings for a csv data set
+     *
+     * @return array
+     */
+    public function rawHeadings()
+    {
+        if (!$this->hasHeadings()) {
+            return [];
+        }
 
-		if (count($raw) != count(array_unique($raw))) {
-			throw new Exception('Some headings are not unique (Case insensitive)');
-		}
+        $this->rewind();
+        $raw = $this->fgetcsv();
 
-		return $raw;
-	}
+        if (count($raw) != count(array_unique($raw))) {
+            throw new Exception('Some headings are not unique (Case insensitive)');
+        }
 
-/**
- * overload the method to create array with heading => value
- *
- * @return array
- */
-	public function read() {
-		$row = $this->fgetcsv();
-		if (count($row) === 1 && is_null(current($row)) || is_null($row)) {
-			return array();
-		}
+        return $raw;
+    }
 
-		$headings = $this->headings();
-		if (!empty($headings)) {
-			$row = array_combine($headings, $row);
-		}
+    /**
+     * overload the method to create array with heading => value
+     *
+     * @return array
+     */
+    public function read()
+    {
+        $row = $this->fgetcsv();
+        if (count($row) === 1 && is_null(current($row)) || is_null($row)) {
+            return [];
+        }
 
-		return Hash::expand($row);
-	}
+        $headings = $this->headings();
+        if (!empty($headings)) {
+            $row = array_combine($headings, $row);
+        }
+
+        return Hash::expand($row);
+    }
 }

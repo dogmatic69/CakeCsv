@@ -10,15 +10,17 @@ use Cake\Database\Schema\Table;
  *
  * @package dogmatic69.CakeCSV.Database
  */
-class CsvTable extends Table {
+class CsvTable extends Table
+{
 
-/**
- * Constructor
- * 
- * @param string $table the table name to be created
- * @param array $columns the list of columns to be created
- */
-    public function __construct($table, array $columns = []) {
+    /**
+     * Constructor
+     *
+     * @param string $table the table name to be created
+     * @param array $columns the list of columns to be created
+     */
+    public function __construct($table, array $columns = [])
+    {
         parent::__construct($table, $columns);
 
         $this->options([
@@ -27,14 +29,14 @@ class CsvTable extends Table {
         ]);
     }
 
-/**
- * Create table from the headers
- *
- * @param array $headers the headers from the CSV file used to create the database
- * 
- * @return CsvTable
- */
-    public function fromHeader(array $headers) 
+    /**
+     * Create table from the headers
+     *
+     * @param array $headers the headers from the CSV file used to create the database
+     *
+     * @return CsvTable
+     */
+    public function fromHeader(array $headers)
     {
         $this->addColumn('id', [
             'type' => 'string',

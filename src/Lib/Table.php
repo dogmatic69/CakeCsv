@@ -2,21 +2,37 @@
 namespace CakeCsv\Lib;
 
 use CakeCsv\Database\Schema\CsvTable;
-use Cake\Utility\Inflector;
 use Cake\Datasource\ConnectionManager;
+use Cake\Utility\Inflector;
 
+/**
+ * Table
+ *
+ * @package dogmatic69.CakeCsv.Lib
+ */
 class Table
 {
 
-/**
- * Connection instance
- *
- * @var ConnectionInterface
- */
-    protected $_db = null;
+    /**
+     * Connection instance
+     *
+     * @var ConnectionInterface
+     */
+    protected $_db;
 
-    protected $_file = null;
+    /**
+     * Instance of the File object
+     *
+     * @var File
+     */
+    protected $_file;
 
+    /**
+     * Constructor
+     *
+     * @param File $File the file instance
+     * @param array $config the config to be used
+     */
     public function __construct(File $File, array $config = [])
     {
         $this->_file = $File;
@@ -27,12 +43,24 @@ class Table
         $this->_db = ConnectionManager::get($config['connection']);
     }
 
+    /**
+     * Figure out the table name from the file name
+     *
+     * @return string
+     */
     public function tableNameFromFileName()
     {
         $filename = trim($this->_file->getBasename($this->_file->getExtension()), '.');
         return Inflector::slug(Inflector::underscore(Inflector::classify($filename)), '_');
     }
 
+    /**
+     * Create the table for the CSV file
+     *
+     * @param bool $dropFirst set to true to try drop before creation
+     *
+     * @return string
+     */
     public function createSchema($dropFirst = false)
     {
         $tableName = $this->tableNameFromFileName();
@@ -50,13 +78,19 @@ class Table
         return $tableName;
     }
 
-    protected function _dropTable($Csv) 
+    /**
+     * Try and drop the given table
+     *
+     * @param CsvTable $Csv the CsvTable instance
+     *
+     * @return bool
+     */
+    protected function _dropTable(CsvTable $Csv)
     {
         foreach ($Csv->dropSql($this->_db) as $sql) {
             try {
                 $this->_db->execute($sql);
             } catch (\PDOException $e) {
-
             }
         }
         return true;
